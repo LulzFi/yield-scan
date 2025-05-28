@@ -1,8 +1,7 @@
+use super::{Tools, config::DB_PATH};
 use sqlx::{Pool, Sqlite, SqlitePool, sqlite::SqliteConnectOptions};
 use std::sync::Arc;
 use tokio::sync::OnceCell;
-
-use super::{Tools, config::DB_PATH};
 
 pub static DB_SQLITE: OnceCell<Arc<Pool<Sqlite>>> = OnceCell::const_new();
 

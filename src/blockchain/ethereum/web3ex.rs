@@ -29,6 +29,7 @@ pub struct ERC20TokenInfo {
 #[async_trait]
 pub trait Web3Ex<T: Transport + Send + Sync> {
     async fn get_chain_id(&self) -> u64;
+    async fn get_blocknumber_wait(&self) -> u64;
     async fn get_block_receiepts(&self, blocknumber: BlockId) -> web3::Result<Vec<TransactionReceipt>>;
     async fn get_event_logs(&self, contracts: &Vec<String>, blocknumber: u64) -> web3::Result<Vec<Log>>;
     async fn get_erc20_balance(&self, contract_address: Address, address: Address) -> web3::contract::Result<U256>;
@@ -53,6 +54,16 @@ where
 {
     async fn get_chain_id(&self) -> u64 {
         self.eth().chain_id().await.unwrap().as_u64()
+    }
+
+    async fn get_blocknumber_wait(&self) -> u64 {
+        loop {
+            if let Ok(blocknumber) = self.eth().block_number().await {
+                return blocknumber.as_u64();
+            } else {
+                tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+            }
+        }
     }
 
     async fn get_block_receiepts(&self, blocknumber: BlockId) -> web3::Result<Vec<TransactionReceipt>> {

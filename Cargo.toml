@@ -28,3 +28,4 @@ anyhow = "1.0.98"
 libc = "0.2.172"
 ethers-core = "2.0.14"
 sqlx = { version = "0.8.6", features = ["macros", "runtime-tokio", "sqlite"] }
+once_cell = "1.21.3"

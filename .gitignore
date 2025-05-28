@@ -1,1 +1,9 @@
 /target
+/logs
+.DS_Store
+db.sqlite*
+.vscode
+node_modules
+config.json
+.env
+Cargo.lock

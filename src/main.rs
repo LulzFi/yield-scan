@@ -3,7 +3,7 @@ use log::info;
 use tokio;
 use v3scan::{
     api,
-    libs::{adjust_open_files, config, log::init_log},
+    libs::{adjust_open_files, config, db_sqlite::sqlite_init, log::init_log},
     v3_scan::V3ScanWorker,
 };
 
@@ -23,12 +23,13 @@ async fn main() -> anyhow::Result<()> {
     })
     .expect("Error setting Ctrl-C handler");
 
-    api::server::run(false).await;
+    sqlite_init().await?;
 
     let app = V3ScanWorker::new();
     app.init().await.unwrap();
-
     app.run().await.unwrap();
+
+    api::server::run(true).await;
 
     Ok(())
 }
