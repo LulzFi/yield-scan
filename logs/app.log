@@ -1,0 +1,127 @@
+2025-05-29T01:18:45.911289+08:00 INFO Args { http_bind: "127.0.0.1", http_port: 8711, open_files_limit: 10240, rpc_endpoint: "https://bsc-rpc.publicnode.com", db_path: "./db.sqlite3" }
+2025-05-29T01:18:45.911350+08:00 INFO current open files limit: 2560
+2025-05-29T01:18:45.911369+08:00 INFO new open files limit: 10240
+2025-05-29T01:18:45.912283+08:00 INFO starting 8 workers
+2025-05-29T01:18:45.912316+08:00 INFO RESTful API server started at http://127.0.0.1:8711
+2025-05-29T01:18:45.913133+08:00 INFO Tokio runtime found; starting in existing Tokio runtime
+2025-05-29T01:18:45.913173+08:00 INFO starting service: "actix-web-service-127.0.0.1:8711", workers: 8, listening on: 127.0.0.1:8711
+2025-05-29T01:21:18.553382+08:00 INFO Args { http_bind: "127.0.0.1", http_port: 8711, open_files_limit: 10240, rpc_endpoint: "https://bsc-rpc.publicnode.com", db_path: "./db.sqlite3" }
+2025-05-29T01:21:18.553571+08:00 INFO current open files limit: 2560
+2025-05-29T01:21:18.553593+08:00 INFO new open files limit: 10240
+2025-05-29T01:21:18.554547+08:00 INFO starting 8 workers
+2025-05-29T01:21:18.554574+08:00 INFO RESTful API server started at http://127.0.0.1:8711
+2025-05-29T01:21:18.556059+08:00 INFO Tokio runtime found; starting in existing Tokio runtime
+2025-05-29T01:21:18.556104+08:00 INFO starting service: "actix-web-service-127.0.0.1:8711", workers: 8, listening on: 127.0.0.1:8711
+2025-05-29T01:21:20.677650+08:00 INFO Received Ctrl+C signal. Exiting...
+2025-05-29T01:22:24.401329+08:00 INFO Args { http_bind: "127.0.0.1", http_port: 8711, open_files_limit: 10240, rpc_endpoint: "https://bsc-rpc.publicnode.com", db_path: "./db.sqlite3" }
+2025-05-29T01:22:24.401380+08:00 INFO current open files limit: 1048575
+2025-05-29T01:22:24.401399+08:00 INFO new open files limit: 10240
+2025-05-29T01:22:24.402146+08:00 INFO starting 8 workers
+2025-05-29T01:22:24.402179+08:00 INFO RESTful API server started at http://127.0.0.1:8711
+2025-05-29T01:22:24.408006+08:00 INFO Tokio runtime found; starting in existing Tokio runtime
+2025-05-29T01:22:24.408054+08:00 INFO starting service: "actix-web-service-127.0.0.1:8711", workers: 8, listening on: 127.0.0.1:8711
+2025-05-29T01:22:55.643225+08:00 INFO Args { http_bind: "127.0.0.1", http_port: 8711, open_files_limit: 10240, rpc_endpoint: "https://bsc-rpc.publicnode.com", db_path: "./db.sqlite3" }
+2025-05-29T01:22:55.643274+08:00 INFO current open files limit: 1048575
+2025-05-29T01:22:55.643290+08:00 INFO new open files limit: 10240
+2025-05-29T01:22:55.643989+08:00 INFO starting 8 workers
+2025-05-29T01:22:55.644028+08:00 INFO RESTful API server started at http://127.0.0.1:8711
+2025-05-29T01:22:55.649679+08:00 INFO Tokio runtime found; starting in existing Tokio runtime
+2025-05-29T01:22:55.649736+08:00 INFO starting service: "actix-web-service-127.0.0.1:8711", workers: 8, listening on: 127.0.0.1:8711
+2025-05-29T01:22:57.637630+08:00 INFO Fetching pool info for: 0x3a960a3468ec701242ffdf5d912b387cf58c480a, Protocol: UniswapV3
+2025-05-29T01:24:23.106454+08:00 INFO Args { http_bind: "127.0.0.1", http_port: 8711, open_files_limit: 10240, rpc_endpoint: "https://bsc-rpc.publicnode.com", db_path: "./db.sqlite3" }
+2025-05-29T01:24:23.106511+08:00 INFO current open files limit: 1048575
+2025-05-29T01:24:23.106543+08:00 INFO new open files limit: 10240
+2025-05-29T01:24:23.108239+08:00 INFO starting 8 workers
+2025-05-29T01:24:23.108287+08:00 INFO RESTful API server started at http://127.0.0.1:8711
+2025-05-29T01:24:23.111174+08:00 INFO Tokio runtime found; starting in existing Tokio runtime
+2025-05-29T01:24:23.111527+08:00 INFO starting service: "actix-web-service-127.0.0.1:8711", workers: 8, listening on: 127.0.0.1:8711
+2025-05-29T01:24:25.302233+08:00 INFO Fetching pool info for: 0x2bb75e055070aaa283b0f2070b0161b3f46f3c8c, Protocol: PancakeSwapV3
+2025-05-29T01:24:57.017776+08:00 INFO Args { http_bind: "127.0.0.1", http_port: 8711, open_files_limit: 10240, rpc_endpoint: "https://bsc-rpc.publicnode.com", db_path: "./db.sqlite3" }
+2025-05-29T01:24:57.020742+08:00 INFO current open files limit: 1048575
+2025-05-29T01:24:57.020765+08:00 INFO new open files limit: 10240
+2025-05-29T01:24:57.028660+08:00 INFO starting 8 workers
+2025-05-29T01:24:57.028741+08:00 INFO RESTful API server started at http://127.0.0.1:8711
+2025-05-29T01:24:57.029308+08:00 INFO Tokio runtime found; starting in existing Tokio runtime
+2025-05-29T01:24:57.029348+08:00 INFO starting service: "actix-web-service-127.0.0.1:8711", workers: 8, listening on: 127.0.0.1:8711
+2025-05-29T01:24:58.456968+08:00 INFO Fetching pool info for: 0x25611630efc511d0291f5d9dd5176846e3f4ca24, Protocol: PancakeSwapV3
+2025-05-29T01:25:27.641820+08:00 INFO Args { http_bind: "127.0.0.1", http_port: 8711, open_files_limit: 10240, rpc_endpoint: "https://bsc-rpc.publicnode.com", db_path: "./db.sqlite3" }
+2025-05-29T01:25:27.641874+08:00 INFO current open files limit: 2560
+2025-05-29T01:25:27.641906+08:00 INFO new open files limit: 10240
+2025-05-29T01:25:27.643609+08:00 INFO starting 8 workers
+2025-05-29T01:25:27.643662+08:00 INFO RESTful API server started at http://127.0.0.1:8711
+2025-05-29T01:25:27.646029+08:00 INFO Tokio runtime found; starting in existing Tokio runtime
+2025-05-29T01:25:27.646573+08:00 INFO starting service: "actix-web-service-127.0.0.1:8711", workers: 8, listening on: 127.0.0.1:8711
+2025-05-29T01:25:29.702950+08:00 INFO Fetching pool info for: 0x69b86059c5fb3a44355937e7b505a659443b9a22, Protocol: PancakeSwapV3
+2025-05-29T01:26:35.713219+08:00 INFO Args { http_bind: "127.0.0.1", http_port: 8711, open_files_limit: 10240, rpc_endpoint: "https://bsc-rpc.publicnode.com", db_path: "./db.sqlite3" }
+2025-05-29T01:26:35.713264+08:00 INFO current open files limit: 2560
+2025-05-29T01:26:35.713291+08:00 INFO new open files limit: 10240
+2025-05-29T01:26:35.714639+08:00 INFO starting 8 workers
+2025-05-29T01:26:35.714727+08:00 INFO RESTful API server started at http://127.0.0.1:8711
+2025-05-29T01:26:35.717489+08:00 INFO Tokio runtime found; starting in existing Tokio runtime
+2025-05-29T01:26:35.717552+08:00 INFO starting service: "actix-web-service-127.0.0.1:8711", workers: 8, listening on: 127.0.0.1:8711
+2025-05-29T01:26:37.309258+08:00 INFO Fetching pool info for: 0xd0e226f674bbf064f54ab47f42473ff80db98cba, Protocol: PancakeSwapV3
+2025-05-29T01:27:43.622575+08:00 INFO Args { http_bind: "127.0.0.1", http_port: 8711, open_files_limit: 10240, rpc_endpoint: "https://bsc-rpc.publicnode.com", db_path: "./db.sqlite3" }
+2025-05-29T01:27:43.622627+08:00 INFO current open files limit: 1048575
+2025-05-29T01:27:43.622645+08:00 INFO new open files limit: 10240
+2025-05-29T01:27:43.623468+08:00 INFO starting 8 workers
+2025-05-29T01:27:43.623531+08:00 INFO RESTful API server started at http://127.0.0.1:8711
+2025-05-29T01:27:43.624119+08:00 INFO Tokio runtime found; starting in existing Tokio runtime
+2025-05-29T01:27:43.624164+08:00 INFO starting service: "actix-web-service-127.0.0.1:8711", workers: 8, listening on: 127.0.0.1:8711
+2025-05-29T01:27:45.405981+08:00 INFO Fetching pool info for: 0x172fcd41e0913e95784454622d1c3724f546f849, Protocol: PancakeSwapV3
+2025-05-29T01:30:39.928302+08:00 INFO Args { http_bind: "127.0.0.1", http_port: 8711, open_files_limit: 10240, rpc_endpoint: "https://bsc-rpc.publicnode.com", db_path: "./db.sqlite3" }
+2025-05-29T01:30:39.928351+08:00 INFO current open files limit: 1048575
+2025-05-29T01:30:39.928368+08:00 INFO new open files limit: 10240
+2025-05-29T01:30:39.929094+08:00 INFO starting 8 workers
+2025-05-29T01:30:39.929132+08:00 INFO RESTful API server started at http://127.0.0.1:8711
+2025-05-29T01:30:39.929840+08:00 INFO Tokio runtime found; starting in existing Tokio runtime
+2025-05-29T01:30:39.929863+08:00 INFO starting service: "actix-web-service-127.0.0.1:8711", workers: 8, listening on: 127.0.0.1:8711
+2025-05-29T01:31:03.209339+08:00 INFO Args { http_bind: "127.0.0.1", http_port: 8711, open_files_limit: 10240, rpc_endpoint: "https://bsc-rpc.publicnode.com", db_path: "./db.sqlite3" }
+2025-05-29T01:31:03.209383+08:00 INFO current open files limit: 1048575
+2025-05-29T01:31:03.209417+08:00 INFO new open files limit: 10240
+2025-05-29T01:31:03.210123+08:00 INFO starting 8 workers
+2025-05-29T01:31:03.210159+08:00 INFO RESTful API server started at http://127.0.0.1:8711
+2025-05-29T01:31:03.210712+08:00 INFO Tokio runtime found; starting in existing Tokio runtime
+2025-05-29T01:31:03.210733+08:00 INFO starting service: "actix-web-service-127.0.0.1:8711", workers: 8, listening on: 127.0.0.1:8711
+2025-05-29T01:31:05.777997+08:00 INFO Fetching pool info for: 0x7f51c8aaa6b0599abd16674e2b17fec7a9f674a1, Protocol: PancakeSwapV3
+2025-05-29T01:32:53.951493+08:00 INFO Args { http_bind: "127.0.0.1", http_port: 8711, open_files_limit: 10240, rpc_endpoint: "https://bsc-rpc.publicnode.com", db_path: "./db.sqlite3" }
+2025-05-29T01:32:53.951542+08:00 INFO current open files limit: 1048575
+2025-05-29T01:32:53.951557+08:00 INFO new open files limit: 10240
+2025-05-29T01:32:53.952308+08:00 INFO starting 8 workers
+2025-05-29T01:32:53.952364+08:00 INFO RESTful API server started at http://127.0.0.1:8711
+2025-05-29T01:32:53.952978+08:00 INFO Tokio runtime found; starting in existing Tokio runtime
+2025-05-29T01:32:53.953026+08:00 INFO starting service: "actix-web-service-127.0.0.1:8711", workers: 8, listening on: 127.0.0.1:8711
+2025-05-29T01:32:55.475983+08:00 INFO Fetching pool info for: 0x12c95b97c0a9b2bbc74d70d78e04fca39662ffc7, Protocol: PancakeSwapV3
+2025-05-29T01:33:31.357647+08:00 INFO Args { http_bind: "127.0.0.1", http_port: 8711, open_files_limit: 10240, rpc_endpoint: "https://bsc-rpc.publicnode.com", db_path: "./db.sqlite3" }
+2025-05-29T01:33:31.357685+08:00 INFO current open files limit: 1048575
+2025-05-29T01:33:31.357707+08:00 INFO new open files limit: 10240
+2025-05-29T01:33:31.358341+08:00 INFO starting 8 workers
+2025-05-29T01:33:31.358382+08:00 INFO RESTful API server started at http://127.0.0.1:8711
+2025-05-29T01:33:31.358972+08:00 INFO Tokio runtime found; starting in existing Tokio runtime
+2025-05-29T01:33:31.359010+08:00 INFO starting service: "actix-web-service-127.0.0.1:8711", workers: 8, listening on: 127.0.0.1:8711
+2025-05-29T01:33:33.784611+08:00 INFO Fetching pool info for: 0x172fcd41e0913e95784454622d1c3724f546f849, Protocol: PancakeSwapV3
+2025-05-29T01:34:36.093508+08:00 INFO Args { http_bind: "127.0.0.1", http_port: 8711, open_files_limit: 10240, rpc_endpoint: "https://bsc-rpc.publicnode.com", db_path: "./db.sqlite3" }
+2025-05-29T01:34:36.093546+08:00 INFO current open files limit: 1048575
+2025-05-29T01:34:36.093563+08:00 INFO new open files limit: 10240
+2025-05-29T01:34:36.094218+08:00 INFO starting 8 workers
+2025-05-29T01:34:36.094261+08:00 INFO RESTful API server started at http://127.0.0.1:8711
+2025-05-29T01:34:36.094842+08:00 INFO Tokio runtime found; starting in existing Tokio runtime
+2025-05-29T01:34:36.094901+08:00 INFO starting service: "actix-web-service-127.0.0.1:8711", workers: 8, listening on: 127.0.0.1:8711
+2025-05-29T01:34:37.212971+08:00 INFO Fetching pool info for: 0x81c7294b66955824bc04acb642ae8dc58e6ce507, Protocol: UniswapV3
+2025-05-29T01:36:57.147577+08:00 INFO Args { http_bind: "127.0.0.1", http_port: 8711, open_files_limit: 10240, rpc_endpoint: "https://bsc-rpc.publicnode.com", db_path: "./db.sqlite3" }
+2025-05-29T01:36:57.147644+08:00 INFO current open files limit: 1048575
+2025-05-29T01:36:57.147669+08:00 INFO new open files limit: 10240
+2025-05-29T01:36:57.148959+08:00 INFO starting 8 workers
+2025-05-29T01:36:57.149006+08:00 INFO RESTful API server started at http://127.0.0.1:8711
+2025-05-29T01:36:57.150891+08:00 INFO Tokio runtime found; starting in existing Tokio runtime
+2025-05-29T01:36:57.150935+08:00 INFO starting service: "actix-web-service-127.0.0.1:8711", workers: 8, listening on: 127.0.0.1:8711
+2025-05-29T01:36:58.997158+08:00 INFO tx: 0xd608ac9444a28fc7d4569fddee6a37e53a125b224410f7c21feb5a75323b4438
+2025-05-29T01:36:58.997204+08:00 INFO tx: 0x6a3f05ad76e4f74b047f2800fa5c9b46158e3045bbc32a57f7515d99faf10ec2
+2025-05-29T01:37:00.046829+08:00 INFO pool: PancakeSwapV3 0xbdccafb234be6dc2545b0c25b0a5f5d9d1124228
+2025-05-29T01:37:00.047043+08:00 INFO Pool: 0xbdccafb234be6dc2545b0c25b0a5f5d9d1124228, Token: 0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d, Amount: 306, Protocol: PancakeSwapV3
+2025-05-29T01:37:01.070053+08:00 INFO pool: PancakeSwapV3 0xf2688fb5b81049dfb7703ada5e770543770612c4
+2025-05-29T01:37:01.070216+08:00 INFO Pool: 0xf2688fb5b81049dfb7703ada5e770543770612c4, Token: 0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d, Amount: 306, Protocol: PancakeSwapV3
+2025-05-29T01:37:01.070386+08:00 INFO tx: 0x2282bf5a9fd8f8aa7e4c66889146b593a309f02d9118871d2a49970cfdf03df5
+2025-05-29T01:37:02.101015+08:00 INFO pool: PancakeSwapV3 0x98d6e81f14b2278455311738267d6cf93160be35
+2025-05-29T01:37:02.101286+08:00 INFO Pool: 0x98d6e81f14b2278455311738267d6cf93160be35, Token: 0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d, Amount: 583, Protocol: PancakeSwapV3
+2025-05-29T01:37:02.101410+08:00 INFO tx: 0x0bce0cc5bacc9700db23480df0c4cc510c27a23bac58a275ee11d92dd26b8ac0
+2025-05-29T01:37:03.065609+08:00 INFO Received Ctrl+C signal. Exiting...
