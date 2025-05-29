@@ -24,6 +24,7 @@ pub struct JsonConfig {
     pub wrap_token: String,
     pub stable_tokens: HashMap<String, String>,
     pub swap_topics: HashMap<String, String>,
+    pub factories: HashMap<String, String>,
 }
 
 pub static JSON_CONFIG: Lazy<JsonConfig> = Lazy::new(|| {

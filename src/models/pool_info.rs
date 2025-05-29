@@ -1,6 +1,7 @@
 #[derive(Debug, Clone, sqlx::FromRow)]
 pub struct PoolInfoModel {
     pub protocol: String,
+    pub factory: String,
     pub pool: String,
     pub token0: String,
     pub token1: String,

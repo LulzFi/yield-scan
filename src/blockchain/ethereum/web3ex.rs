@@ -34,7 +34,7 @@ pub trait Web3Ex<T: Transport + Send + Sync> {
     async fn get_event_logs(&self, contracts: &Vec<String>, blocknumber: u64) -> web3::Result<Vec<Log>>;
     async fn get_erc20_balance(&self, contract_address: Address, address: Address) -> web3::contract::Result<U256>;
     async fn get_erc20_info(&self, token_contract: Address) -> web3::contract::Result<ERC20TokenInfo>;
-    async fn query_smart_comtract<R, P>(
+    async fn query_smart_contract<R, P>(
         &self,
         contract_address: Address,
         abi: &str,
@@ -84,11 +84,11 @@ where
     }
 
     async fn get_erc20_balance(&self, contract_address: Address, address: Address) -> web3::contract::Result<U256> {
-        self.query_smart_comtract::<U256, (Address,)>(contract_address, ERC20_ABI, "balanceOf", (address,), None)
+        self.query_smart_contract::<U256, (Address,)>(contract_address, ERC20_ABI, "balanceOf", (address,), None)
             .await
     }
 
-    async fn query_smart_comtract<R, P>(
+    async fn query_smart_contract<R, P>(
         &self,
         contract_address: Address,
         abi: &str,
@@ -107,10 +107,10 @@ where
 
     async fn get_erc20_info(&self, token_contract: Address) -> web3::contract::Result<ERC20TokenInfo> {
         match futures::try_join!(
-            self.query_smart_comtract::<String, _>(token_contract, ERC20_ABI, "name", (), None),
-            self.query_smart_comtract::<String, _>(token_contract, ERC20_ABI, "symbol", (), None),
-            self.query_smart_comtract::<u64, _>(token_contract, ERC20_ABI, "decimals", (), None),
-            self.query_smart_comtract::<U256, _>(token_contract, ERC20_ABI, "totalSupply", (), None)
+            self.query_smart_contract::<String, _>(token_contract, ERC20_ABI, "name", (), None),
+            self.query_smart_contract::<String, _>(token_contract, ERC20_ABI, "symbol", (), None),
+            self.query_smart_contract::<u64, _>(token_contract, ERC20_ABI, "decimals", (), None),
+            self.query_smart_contract::<U256, _>(token_contract, ERC20_ABI, "totalSupply", (), None)
         ) {
             Ok((name, symbol, decimals, total_supply)) => Ok(ERC20TokenInfo {
                 name: name.trim_end_matches('\0').to_string(),

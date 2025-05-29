@@ -39,6 +39,7 @@ impl V3ScanWorker {
             .fetch_all(get_sqlite_pool().as_ref())
             .await?;
 
+        log::info!("Load {} pools from database", pools.len());
         let mut pools_map = POOLS.write().unwrap();
         for pool in pools {
             pools_map.insert(pool.pool.clone(), pool);
@@ -78,7 +79,7 @@ impl V3ScanWorker {
                     work_blocknumber += 1;
                 }
                 Err(e) => {
-                    log::error!("Error scanning block {}: {}", work_blocknumber, e);
+                    log::error!("Error scanning block {}: {} {}", work_blocknumber, e, e.backtrace());
                     tokio::time::sleep(std::time::Duration::from_secs(1)).await;
                 }
             }
@@ -101,59 +102,92 @@ impl V3ScanWorker {
         Ok(())
     }
 
-    pub async fn get_pool_info(pool_protocol: &str, pool: Address) -> anyhow::Result<PoolInfoModel> {
+    pub async fn get_pool_info(pool_protocol: &str, pool: Address) -> anyhow::Result<Option<PoolInfoModel>> {
+        const LIQUIDITY_TIMEOUT: u64 = 5 * 60;
         let mut pool_info = if let Some(pool_info) = POOLS.read().unwrap().get(&pool.to_hex_string()) {
-            if get_timestamp() - pool_info.timestamp < 60 {
-                return Ok(pool_info.clone());
+            if get_timestamp() - pool_info.timestamp < LIQUIDITY_TIMEOUT {
+                return Ok(Some(pool_info.clone()));
             }
             pool_info.clone()
         } else {
-            Self::get_pool_info_web3(pool_protocol, pool).await?
+            if let Some(pool_info) = Self::get_pool_info_web3(pool_protocol, pool).await? {
+                pool_info
+            } else {
+                return Ok(None);
+            }
         };
 
-        if get_timestamp() - pool_info.timestamp > 60 {
-            let token0_liquidity = get_web3_rpc_client().get_erc20_balance(pool_info.token0.parse::<Address>()?, pool).await?;
-            let token1_liquidity = get_web3_rpc_client().get_erc20_balance(pool_info.token1.parse::<Address>()?, pool).await?;
+        if get_timestamp() - pool_info.timestamp > LIQUIDITY_TIMEOUT {
+            let web31 = get_web3_rpc_client();
+            let web32 = get_web3_rpc_client();
+            let (token0_liquidity, token1_liquidity) = futures::try_join!(
+                web31.get_erc20_balance(pool_info.token0.parse::<Address>()?, pool),
+                web32.get_erc20_balance(pool_info.token1.parse::<Address>()?, pool)
+            )?;
+
             pool_info.token0_liquidity = (token0_liquidity.as_u128() / (10i128.pow(18) as u128)) as u64;
             pool_info.token1_liquidity = (token1_liquidity.as_u128() / (10i128.pow(18) as u128)) as u64;
             pool_info.timestamp = get_timestamp();
         }
 
         POOLS.write().unwrap().insert(pool.to_hex_string(), pool_info.clone());
-        sqlx::query("INSERT INTO pools (protocol, pool, token0, token1, fee, token0_liquidity, token1_liquidity, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
-            .bind(&pool_info.protocol)
-            .bind(&pool_info.pool)
-            .bind(&pool_info.token0)
-            .bind(&pool_info.token1)
-            .bind(pool_info.fee as i32)
-            .bind(pool_info.token0_liquidity as i64)
-            .bind(pool_info.token1_liquidity as i64)
-            .bind(pool_info.timestamp as i64)
-            .execute(get_sqlite_pool().as_ref())
-            .await?;
+        sqlx::query(
+            "INSERT OR REPLACE INTO pools (protocol, pool, factory, token0, token1, fee, token0_liquidity, token1_liquidity, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        )
+        .bind(&pool_info.protocol)
+        .bind(&pool_info.pool)
+        .bind(&pool_info.factory)
+        .bind(&pool_info.token0)
+        .bind(&pool_info.token1)
+        .bind(pool_info.fee as i32)
+        .bind(pool_info.token0_liquidity as i64)
+        .bind(pool_info.token1_liquidity as i64)
+        .bind(pool_info.timestamp as i64)
+        .execute(get_sqlite_pool().as_ref())
+        .await?;
 
-        Ok(pool_info)
+        Ok(Some(pool_info))
     }
 
-    pub async fn get_pool_info_web3(pool_protocol: &str, pool: Address) -> anyhow::Result<PoolInfoModel> {
-        let web3 = get_web3_rpc_client();
-        let fee_rate = web3.query_smart_comtract::<u64, _>(pool, UNISWAPV3_POOL_ABI, "fee", (), None).await?;
-        let token0: Address = web3.query_smart_comtract::<Address, _>(pool, UNISWAPV3_POOL_ABI, "token0", (), None).await?;
-        let token1: Address = web3.query_smart_comtract::<Address, _>(pool, UNISWAPV3_POOL_ABI, "token1", (), None).await?;
-        let token0_liquidity = web3.get_erc20_balance(token0, pool).await?;
-        let token1_liquidity = web3.get_erc20_balance(token1, pool).await?;
+    pub async fn get_pool_info_web3(pool_protocol: &str, pool: Address) -> anyhow::Result<Option<PoolInfoModel>> {
+        let web31 = get_web3_rpc_client();
+        let web32 = get_web3_rpc_client();
+        let web33 = get_web3_rpc_client();
+
+        log::info!("Get pool info: {} {}", pool_protocol, pool.to_hex_string());
+        let factory = web31.query_smart_contract::<Address, _>(pool, UNISWAPV3_POOL_ABI, "factory", (), None).await?;
+        if !JSON_CONFIG.factories.contains_key(&factory.to_hex_string()) {
+            return Ok(None);
+        }
+
+        let (fee_rate, token0, token1) = futures::try_join!(
+            web31.query_smart_contract::<u64, _>(pool, UNISWAPV3_POOL_ABI, "fee", (), None),
+            web32.query_smart_contract::<Address, _>(pool, UNISWAPV3_POOL_ABI, "token0", (), None),
+            web33.query_smart_contract::<Address, _>(pool, UNISWAPV3_POOL_ABI, "token1", (), None)
+        )?;
+
+        log::info!(
+            "Pool: {}, Token0: {}, Token1: {}, Fee: {}",
+            pool.to_hex_string(),
+            token0.to_hex_string(),
+            token1.to_hex_string(),
+            fee_rate
+        );
+        let (token0_liquidity, token1_liquidity) = futures::try_join!(web31.get_erc20_balance(token0, pool), web32.get_erc20_balance(token1, pool))?;
+
         let pool_info = PoolInfoModel {
             protocol: pool_protocol.to_string(),
+            factory: factory.to_hex_string(),
             pool: pool.to_hex_string(),
             token0: token0.to_hex_string(),
             token1: token1.to_hex_string(),
             fee: fee_rate,
             token0_liquidity: (token0_liquidity.as_u128() / (10i128.pow(18) as u128)) as u64,
             token1_liquidity: (token1_liquidity.as_u128() / (10i128.pow(18) as u128)) as u64,
-            timestamp: 0, // Timestamp will be set later
+            timestamp: get_timestamp(),
         };
 
-        Ok(pool_info)
+        Ok(Some(pool_info))
     }
 
     pub fn parse_tx_log_v3_swap_amount(log: &web3::types::Log) -> (i128, i128) {
@@ -176,7 +210,10 @@ impl V3ScanWorker {
             return Ok(());
         };
 
-        let pool_info = Self::get_pool_info(pool_protocol, tx_log.address).await?;
+        let Some(pool_info) = Self::get_pool_info(pool_protocol, tx_log.address).await? else {
+            return Ok(());
+        };
+
         log::info!("pool: {} {}", pool_protocol.to_string(), tx_log.address.to_hex_string());
         let (amount0, amount1) = Self::parse_tx_log_v3_swap_amount(tx_log);
         let (token, liquidity, amount) = if pool_info.token0 == JSON_CONFIG.wrap_token || JSON_CONFIG.stable_tokens.contains_key(&pool_info.token0) {
@@ -209,17 +246,19 @@ impl V3ScanWorker {
         }
 
         let total_volume: u64 = pool_volume.iter().map(|(_, amt)| *amt).sum();
-        let total_fee_per_min = pool_info.fee * total_volume / 10000 / (VOLUME_CACHE_SIZE as u64);
+        let total_fee_per_min = pool_info.fee * total_volume / 1000000 / (VOLUME_CACHE_SIZE as u64);
         let total_fee_per_hour = total_fee_per_min * 60;
         let fee_rate_per_hour = total_fee_per_hour as f64 / liquidity as f64;
 
         log::info!(
-            "Pool: {}, Token: {}, Amount: {}, Protocol: {}, APH: {}",
+            "-{}s Pool: {}, Fee: {} Amount: {}, APH: {} TotalVolume: {} Liquidity: {}",
+            get_timestamp() - block.timestamp.as_u64(),
             pool_info.pool,
-            token,
+            pool_info.fee,
             amount,
-            pool_protocol,
-            fee_rate_per_hour
+            fee_rate_per_hour,
+            total_volume,
+            liquidity
         );
 
         Ok(())

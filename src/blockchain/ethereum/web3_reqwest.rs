@@ -1,6 +1,9 @@
 use reqwest::Client;
 use std::time::Duration;
+use tokio::time::timeout;
 use web3::Transport;
+
+const TIMEOUT: Duration = Duration::from_secs(3);
 
 // 自定义 Transport 实现
 #[derive(Clone, Debug)]
@@ -16,10 +19,7 @@ impl ReqwestTransport {
             .build()
             .expect("Failed to create reqwest client");
 
-        Self {
-            client,
-            url: url.to_string(),
-        }
+        Self { client, url: url.to_string() }
     }
 }
 
@@ -42,18 +42,15 @@ impl Transport for ReqwestTransport {
     fn send(&self, _id: usize, request: jsonrpc_core::types::request::Call) -> Self::Out {
         let client = self.client.clone();
         let url = self.url.clone();
-        // print!("Request: {} {:?}", url, request);
         Box::pin(async move {
-            let response = client
-                .post(&url)
-                .json(&request)
-                .send()
+            let response = timeout(TIMEOUT, client.post(&url).json(&request).send())
                 .await
+                .map_err(|e| web3::Error::Transport(web3::error::TransportError::Message(e.to_string())))?
                 .map_err(|e| web3::Error::Transport(web3::error::TransportError::Message(e.to_string())))?;
 
-            let json = response
-                .json::<serde_json::Value>()
+            let json = timeout(TIMEOUT, response.json::<serde_json::Value>())
                 .await
+                .map_err(|e| web3::Error::Transport(web3::error::TransportError::Message(e.to_string())))?
                 .map_err(|e| web3::Error::Transport(web3::error::TransportError::Message(e.to_string())))?;
 
             Ok(json["result"].clone())
