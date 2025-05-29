@@ -7,3 +7,4 @@ node_modules
 config.json
 .env
 Cargo.lock
+volume_cache.json

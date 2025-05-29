@@ -1,6 +1,7 @@
 use crate::{
     blockchain::ethereum::{HexParseTrait, Web3Ex, uniswapv3, web3_u256_to_i128},
     libs::{
+        Tools,
         config::{JSON_CONFIG, get_web3_rpc_client},
         db_sqlite::get_sqlite_pool,
         global::{LoopResult, get_timestamp, set_loop_global},
@@ -15,7 +16,7 @@ use std::{
 use web3::types::{Address, Block, BlockId, H256, Log, U256};
 
 const UNISWAPV3_POOL_ABI: &str = include_str!("./blockchain/ethereum/abi/uniswapv3_pair.json");
-const VOLUME_CACHE_SIZE: usize = 10;
+const VOLUME_MINUTES_CACHE_SIZE: usize = 10;
 
 static POOLS: Lazy<RwLock<HashMap<String, PoolInfoModel>>> = Lazy::new(|| RwLock::new(HashMap::new()));
 static NATIVE_TOKEN_PRICE: RwLock<f64> = RwLock::new(0.0);
@@ -30,7 +31,27 @@ impl V3ScanWorker {
 
     pub async fn init(&self) -> anyhow::Result<()> {
         Self::db_load().await?;
+        Self::load_volume_cache()?;
         Self::loop_update_native_token_price().await?;
+        Ok(())
+    }
+
+    pub fn load_volume_cache() -> anyhow::Result<()> {
+        if let Ok(data) = Tools::read_file_text("volume_cache.json") {
+            let volume_cache: HashMap<String, VecDeque<(u64, u64)>> = serde_json::from_str(&data)?;
+            *VOLUME_CACHE.write().unwrap() = volume_cache;
+            log::info!("Loaded {} pools volume cache from file", VOLUME_CACHE.read().unwrap().len());
+        } else {
+            log::info!("No volume cache file found");
+        }
+        Ok(())
+    }
+
+    pub async fn save_volume_cache() -> LoopResult {
+        let volume_cache = VOLUME_CACHE.read().unwrap();
+        let data = serde_json::to_string(&*volume_cache)?;
+        Tools::write_file_text("volume_cache.json", &data)?;
+        log::info!("Saved {} pools volume cache to file", volume_cache.len());
         Ok(())
     }
 
@@ -49,6 +70,7 @@ impl V3ScanWorker {
 
     pub async fn run(&self) -> anyhow::Result<()> {
         set_loop_global(Self::loop_update_native_token_price, 60 * 1000);
+        set_loop_global(Self::save_volume_cache, 10 * 1000);
         tokio::spawn(async move {
             Self::loop_scan().await;
         });
@@ -79,7 +101,7 @@ impl V3ScanWorker {
                     work_blocknumber += 1;
                 }
                 Err(e) => {
-                    log::error!("Error scanning block {}: {} {}", work_blocknumber, e, e.backtrace());
+                    log::error!("Error scanning block {}: {}", work_blocknumber, e);
                     tokio::time::sleep(std::time::Duration::from_secs(1)).await;
                 }
             }
@@ -87,13 +109,13 @@ impl V3ScanWorker {
     }
 
     pub async fn yield_scan(blocknumber: BlockId) -> anyhow::Result<()> {
-        let web31 = get_web3_rpc_client();
-        let web32 = get_web3_rpc_client();
-        let (block, block_receipts) = futures::try_join!(web31.eth().block(blocknumber), web32.get_block_receiepts(blocknumber))?;
+        let web3 = get_web3_rpc_client();
+        let block = web3.eth().block(blocknumber).await?;
+        let block_receipts = web3.get_block_receiepts(blocknumber).await?;
 
         let block = block.ok_or_else(|| anyhow::anyhow!("Block not found"))?;
         for receipt in block_receipts {
-            log::info!("tx: {}", receipt.transaction_hash.to_hex_string());
+            // log::info!("tx: {}", receipt.transaction_hash.to_hex_string());
             for log in receipt.logs {
                 Self::parse_tx_log_v3_swap(&block, &log).await?;
             }
@@ -241,14 +263,14 @@ impl V3ScanWorker {
             pool_volume.push_back((ts_min, amount));
         }
 
-        if pool_volume.len() > VOLUME_CACHE_SIZE {
+        if pool_volume.len() > VOLUME_MINUTES_CACHE_SIZE {
             pool_volume.pop_front();
         }
 
         let total_volume: u64 = pool_volume.iter().map(|(_, amt)| *amt).sum();
-        let total_fee_per_min = pool_info.fee * total_volume / 1000000 / (VOLUME_CACHE_SIZE as u64);
-        let total_fee_per_hour = total_fee_per_min * 60;
-        let fee_rate_per_hour = total_fee_per_hour as f64 / liquidity as f64;
+        let total_fee_cache = pool_info.fee * total_volume / 1000000;
+        let total_fee_hour = ((total_fee_cache as f64) / (VOLUME_MINUTES_CACHE_SIZE as f64)) * 60.0;
+        let fee_rate_per_hour = total_fee_hour as f64 / liquidity as f64;
 
         log::info!(
             "-{}s Pool: {}, Fee: {} Amount: {}, APH: {} TotalVolume: {} Liquidity: {}",
