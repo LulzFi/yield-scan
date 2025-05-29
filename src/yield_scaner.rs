@@ -217,28 +217,30 @@ impl V3ScanWorker {
         log::info!("pool: {} {}", pool_protocol.to_string(), tx_log.address.to_hex_string());
         let (amount0, amount1) = Self::parse_tx_log_v3_swap_amount(tx_log);
         let (token, liquidity, amount) = if pool_info.token0 == JSON_CONFIG.wrap_token || JSON_CONFIG.stable_tokens.contains_key(&pool_info.token0) {
-            (pool_info.token0, pool_info.token0_liquidity, amount0.abs() as f64)
+            (pool_info.token0, pool_info.token0_liquidity as f64, amount0.abs() as f64)
         } else if pool_info.token1 == JSON_CONFIG.wrap_token || JSON_CONFIG.stable_tokens.contains_key(&pool_info.token1) {
-            (pool_info.token1, pool_info.token1_liquidity, amount1.abs() as f64)
+            (pool_info.token1, pool_info.token1_liquidity as f64, amount1.abs() as f64)
         } else {
             return Ok(());
         };
 
-        let amount = (if token == JSON_CONFIG.wrap_token {
-            amount * *NATIVE_TOKEN_PRICE.read().unwrap()
+        let (amount, liquidity) = if token == JSON_CONFIG.wrap_token {
+            (amount * *NATIVE_TOKEN_PRICE.read().unwrap(), liquidity * *NATIVE_TOKEN_PRICE.read().unwrap())
         } else {
-            amount
-        } / (10i128.pow(18) as f64)) as u64;
+            (amount, liquidity)
+        };
+
+        let amount = amount / (10i128.pow(18) as f64);
 
         let ts_min = block.timestamp.as_u64() % 60;
         let mut volume_cache = VOLUME_CACHE.write().unwrap();
         let pool_volume = volume_cache.entry(pool_info.pool.clone()).or_default();
         if let Some((last_ts, last_amount)) = pool_volume.back_mut() {
             if *last_ts == ts_min {
-                *last_amount += amount;
+                *last_amount += amount as u64;
             }
         } else {
-            pool_volume.push_back((ts_min, amount));
+            pool_volume.push_back((ts_min, amount as u64));
         }
 
         if pool_volume.len() > VOLUME_CACHE_SIZE {
