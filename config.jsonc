@@ -29,8 +29,6 @@
         "https://bsc-dataseed2.ninicoin.io/",
         "https://bsc-dataseed3.ninicoin.io/",
         "https://bsc-dataseed4.ninicoin.io/",
-        "https://0xrpc.io/bnb",
-        "https://bsc-pokt.nodies.app",
-        "https://api.zan.top/bsc-mainnet"
+        "https://0xrpc.io/bnb"
     ]
 }

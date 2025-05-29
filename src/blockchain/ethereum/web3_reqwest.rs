@@ -3,7 +3,7 @@ use std::time::Duration;
 use tokio::time::timeout;
 use web3::Transport;
 
-const TIMEOUT: Duration = Duration::from_secs(3);
+const TIMEOUT: Duration = Duration::from_secs(10);
 
 // 自定义 Transport 实现
 #[derive(Clone, Debug)]

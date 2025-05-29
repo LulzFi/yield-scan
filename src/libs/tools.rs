@@ -1,5 +1,8 @@
 use super::global::sleep_ms;
-use std::{io::Read, sync::Arc};
+use std::{
+    io::{Read, Write},
+    sync::Arc,
+};
 use tokio::{
     io::{AsyncReadExt, AsyncWriteExt},
     sync::Semaphore,
@@ -25,6 +28,12 @@ impl Tools {
         let mut file = std::fs::File::open(path)?;
         file.read_to_string(&mut text)?;
         Ok(text)
+    }
+
+    pub fn write_file_text(path: &str, text: &str) -> anyhow::Result<()> {
+        let mut file = std::fs::File::create(path)?;
+        file.write_all(text.as_bytes())?;
+        Ok(())
     }
 
     pub async fn async_read_file_text(path: &str) -> Option<String> {
