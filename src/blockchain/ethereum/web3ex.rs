@@ -58,10 +58,13 @@ where
 
     async fn get_blocknumber_wait(&self) -> u64 {
         loop {
-            if let Ok(blocknumber) = self.eth().block_number().await {
-                return blocknumber.as_u64();
-            } else {
-                tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+            match self.eth().block_number().await {
+                Ok(blocknumber) => return blocknumber.as_u64(),
+                Err(e) => {
+                    log::warn!("Failed to get block number: {}, retrying...", e);
+                    tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+                    continue;
+                }
             }
         }
     }
