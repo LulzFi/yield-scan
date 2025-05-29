@@ -1,6 +1,9 @@
-use super::args::Args;
+use super::{Tools, args::Args};
 use crate::blockchain::ethereum::{Web3Client, init_web3_http};
 use clap::Parser;
+use once_cell::sync::Lazy;
+use serde::Deserialize;
+use std::collections::HashMap;
 
 lazy_static! {
     pub static ref ARGS: Args = Args::parse();
@@ -14,3 +17,17 @@ lazy_static! {
 pub fn get_web3_rpc_client() -> Web3Client {
     init_web3_http(RPC_ENDPOINT.as_str())
 }
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct JsonConfig {
+    pub wrap_token_pool: String,
+    pub wrap_token: String,
+    pub stable_tokens: HashMap<String, String>,
+    pub swap_topics: HashMap<String, String>,
+}
+
+pub static JSON_CONFIG: Lazy<JsonConfig> = Lazy::new(|| {
+    let json_str = Tools::read_file_text("config.jsonc").unwrap();
+    let config = jsonc_parser::parse_to_serde_value(&json_str, &Default::default()).unwrap().unwrap();
+    serde_json::from_value(config).unwrap()
+});

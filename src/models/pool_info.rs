@@ -5,4 +5,7 @@ pub struct PoolInfoModel {
     pub token0: String,
     pub token1: String,
     pub fee: u64,
+    pub token0_liquidity: u64,
+    pub token1_liquidity: u64,
+    pub timestamp: u64,
 }

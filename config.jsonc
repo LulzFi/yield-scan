@@ -1,0 +1,12 @@
+{
+    "wrap_token_pool": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+    "wrap_token": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+    "stable_tokens": {
+        "0x55d398326f99059ff775485246999027b3197955": "USDT",
+        "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d": "USDC"
+    },
+    "swap_topics": {
+        "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67": "uniswapv3",
+        "0x19b47279256b2a23a1665c810c8d55a1758940ee09377d4f8d26497a3577dc83": "pancakev3"
+    }
+}

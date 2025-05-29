@@ -4,7 +4,7 @@ use tokio;
 use v3scan::{
     api,
     libs::{adjust_open_files, config, db_sqlite::sqlite_init, log::init_log},
-    v3_scan::V3ScanWorker,
+    yield_scaner::V3ScanWorker,
 };
 
 #[tokio::main]
