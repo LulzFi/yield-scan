@@ -12,5 +12,13 @@
     "factories": {
         "0xdb1d10011ad0ff90774d0c6bb92e5c5c8b4461f7": "UniswapV3Factory",
         "0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865": "PancakeV3Factory"
-    }
+    },
+    "rpc_endpoints": [
+        "https://bsc-rpc.publicnode.com",
+        "https://binance.llamarpc.com",
+        "https://bsc.rpc.blxrbdn.com",
+        "https://bsc-dataseed1.binance.org/",
+        "https://bsc-dataseed1.defibit.io/",
+        "https://bsc-dataseed1.ninicoin.io/"
+    ]
 }
