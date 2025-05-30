@@ -237,7 +237,6 @@ impl V3ScanWorker {
             return Ok(());
         };
 
-        log::info!("pool: {} {}", pool_protocol.to_string(), tx_log.address.to_hex_string());
         let (amount0, amount1) = Self::parse_tx_log_v3_swap_amount(tx_log);
         let (token, liquidity, amount) = if pool_info.token0 == JSON_CONFIG.wrap_token || JSON_CONFIG.stable_tokens.contains_key(&pool_info.token0) {
             (pool_info.token0, pool_info.token0_liquidity as f64, amount0.abs() as f64)
@@ -247,6 +246,10 @@ impl V3ScanWorker {
             return Ok(());
         };
 
+        if liquidity < 1000.0 {
+            return Ok(());
+        }
+
         let (amount, liquidity) = if token == JSON_CONFIG.wrap_token {
             (amount * *NATIVE_TOKEN_PRICE.read().unwrap(), liquidity * *NATIVE_TOKEN_PRICE.read().unwrap())
         } else {
@@ -254,13 +257,18 @@ impl V3ScanWorker {
         };
 
         let amount = amount / (10i128.pow(18) as f64);
+        if !amount.is_normal() {
+            return Ok(());
+        }
 
-        let ts_min = block.timestamp.as_u64() % 60;
+        let ts_min = block.timestamp.as_u64() / 60;
         let mut volume_cache = VOLUME_CACHE.write().unwrap();
         let pool_volume = volume_cache.entry(pool_info.pool.clone()).or_default();
         if let Some((last_ts, last_amount)) = pool_volume.back_mut() {
             if *last_ts == ts_min {
                 *last_amount += amount as u64;
+            } else {
+                pool_volume.push_back((ts_min, amount as u64));
             }
         } else {
             pool_volume.push_back((ts_min, amount as u64));
@@ -283,9 +291,19 @@ impl V3ScanWorker {
             amount,
             fee_rate_per_hour,
             total_volume,
-            liquidity
+            liquidity as u64
         );
 
+        if fee_rate_per_hour > 0.1 {
+            log::info!(
+                "high yield pool: {} pool: {} token: {} APH: {} Liquidity: {}",
+                pool_protocol,
+                pool_info.pool,
+                token,
+                fee_rate_per_hour,
+                liquidity as u64
+            );
+        }
         Ok(())
     }
 
