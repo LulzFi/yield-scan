@@ -19,7 +19,7 @@ const UNISWAPV3_POOL_ABI: &str = include_str!("./blockchain/ethereum/abi/uniswap
 const VOLUME_MINUTES_CACHE_SIZE: usize = 10;
 
 static POOLS: Lazy<RwLock<HashMap<String, PoolInfoModel>>> = Lazy::new(|| RwLock::new(HashMap::new()));
-static NATIVE_TOKEN_PRICE: RwLock<f64> = RwLock::new(0.0);
+pub static NATIVE_TOKEN_PRICE: RwLock<f64> = RwLock::new(0.0);
 static VOLUME_CACHE: Lazy<RwLock<HashMap<String, VecDeque<(u64, u64)>>>> = Lazy::new(|| RwLock::new(HashMap::new()));
 
 pub struct V3ScanWorker;
@@ -71,6 +71,7 @@ impl V3ScanWorker {
     pub async fn run(&self) -> anyhow::Result<()> {
         set_loop_global(Self::loop_update_native_token_price, 60 * 1000);
         set_loop_global(Self::save_volume_cache, 10 * 1000);
+        set_loop_global(Self::loop_sort_yield, 60 * 1000);
         tokio::spawn(async move {
             Self::loop_scan().await;
         });
@@ -284,6 +285,49 @@ impl V3ScanWorker {
             total_volume,
             liquidity
         );
+
+        Ok(())
+    }
+
+    pub async fn loop_sort_yield() -> LoopResult {
+        let all_pool_info = POOLS.read().unwrap();
+        let all_pool_volume = VOLUME_CACHE.read().unwrap();
+        let mut pools: Vec<(String, f64, f64, f64)> = all_pool_volume
+            .iter()
+            .filter_map(|(pool, volumes)| {
+                let Some(pool_info) = all_pool_info.get(pool) else {
+                    return None;
+                };
+
+                let liquidity = pool_info.get_liquidity();
+                if liquidity < 10000.0 {
+                    return None;
+                }
+
+                let total_volume: u64 = volumes.iter().map(|(_, amt)| *amt).sum();
+                if total_volume < 10000 {
+                    return None;
+                }
+
+                let total_fee_cache = pool_info.fee * total_volume / 1000000;
+                let total_fee_hour = ((total_fee_cache as f64) / (VOLUME_MINUTES_CACHE_SIZE as f64)) * 60.0;
+                let fee_rate_per_hour = total_fee_hour as f64 / liquidity as f64;
+
+                Some((pool.clone(), total_volume as f64, liquidity, fee_rate_per_hour))
+            })
+            .collect();
+        pools.sort_by(|a, b| b.3.partial_cmp(&a.3).unwrap_or(std::cmp::Ordering::Equal));
+        pools.truncate(10);
+        log::info!("Top 10 pools by fee rate per hour:");
+        for (pool, total_volume, liquidity, fee_rate_per_hour) in pools {
+            log::info!(
+                "Pool: {}, Volume: {:.2}, Liquidity: {:.2}, APH: {:.6}",
+                pool,
+                total_volume,
+                liquidity,
+                fee_rate_per_hour
+            );
+        }
 
         Ok(())
     }
