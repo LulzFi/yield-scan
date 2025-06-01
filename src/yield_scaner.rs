@@ -89,7 +89,7 @@ impl V3ScanWorker {
         let web3 = get_web3_rpc_client();
         let mut work_blocknumber = web3.get_blocknumber_wait().await;
         loop {
-            let current_blocknumber = web3.get_blocknumber_wait().await;
+            let current_blocknumber = web3.get_blocknumber_wait().await - 1;
             if work_blocknumber > current_blocknumber {
                 tokio::time::sleep(std::time::Duration::from_secs(1)).await;
                 continue;
@@ -314,16 +314,19 @@ impl V3ScanWorker {
             .iter()
             .filter_map(|(pool, volumes)| {
                 let Some(pool_info) = all_pool_info.get(pool) else {
+                    log::warn!("WPool {} not found in POOLS", pool);
                     return None;
                 };
 
                 let liquidity = pool_info.get_liquidity();
                 if liquidity < 10000.0 {
+                    log::warn!("WPool {} has low liquidity: {}", pool, liquidity);
                     return None;
                 }
 
                 let total_volume: u64 = volumes.iter().map(|(_, amt)| *amt).sum();
                 if total_volume < 10000 {
+                    log::warn!("WPool {} has low total volume: {}", pool, total_volume);
                     return None;
                 }
 
