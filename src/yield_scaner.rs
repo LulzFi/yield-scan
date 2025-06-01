@@ -196,7 +196,11 @@ impl V3ScanWorker {
             token1.to_hex_string(),
             fee_rate
         );
+
+        let divisor = U256::exp10(18);
         let (token0_liquidity, token1_liquidity) = futures::try_join!(web31.get_erc20_balance(token0, pool), web32.get_erc20_balance(token1, pool))?;
+        let token0_liquidity = token0_liquidity / divisor;
+        let token1_liquidity = token1_liquidity / divisor;
 
         let pool_info = PoolInfoModel {
             protocol: pool_protocol.to_string(),
@@ -205,8 +209,8 @@ impl V3ScanWorker {
             token0: token0.to_hex_string(),
             token1: token1.to_hex_string(),
             fee: fee_rate,
-            token0_liquidity: (token0_liquidity.as_u128() / (10i128.pow(18) as u128)) as u64,
-            token1_liquidity: (token1_liquidity.as_u128() / (10i128.pow(18) as u128)) as u64,
+            token0_liquidity: token0_liquidity.as_u64(),
+            token1_liquidity: token1_liquidity.as_u64(),
             timestamp: get_timestamp(),
         };
 
